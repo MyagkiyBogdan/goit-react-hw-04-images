@@ -13,7 +13,7 @@ function Modal({ src, alt, toggleModal }) {
       console.log('Remove listener');
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  });
 
   function handleKeyDown(e) {
     if (e.code === 'Escape') {

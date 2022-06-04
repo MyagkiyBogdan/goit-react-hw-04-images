@@ -1,50 +1,43 @@
-import { Component } from 'react';
+import { useRef, useState } from 'react';
 import styles from './Button.module.css';
 import imagesAPI from '../../services/pixabay-api';
 import PropTypes from 'prop-types';
 import Loader from '../Loader';
 
-class Button extends Component {
-  page = this.props.page;
+function Button({ page, searchInfo, moreImgs }) {
+  const [status, setStatus] = useState('idle');
+  // для того что бы page не сбрасывался при каждом ререндере и вызове функции используем хук useRef
+  const fetchPage = useRef(page);
 
-  // idle
-  // pending
-
-  state = {
-    status: 'idle',
-  };
-
-  handleClickFetchMore = async () => {
-    this.setState({ status: 'pending' });
-    this.page += 1;
+  const handleClickFetchMore = async () => {
+    setStatus('pending');
+    fetchPage.current += 1;
+    console.log(fetchPage.current);
     // pixibay-api import
     const fetchedImages = await imagesAPI.fetchImages(
-      this.props.searchInfo,
-      this.page
+      searchInfo,
+      fetchPage.current
     );
     const images = fetchedImages.hits;
 
-    this.setState({ status: 'idle' });
+    setStatus('idle');
     return images;
   };
 
-  render() {
-    const { status } = this.state;
+  if (status === 'pending') {
+    return <Loader />;
+  }
 
-    if (status === 'pending') {
-      return <Loader />;
-    }
-    if (status === 'idle') {
-      return (
-        <button
-          type="button"
-          className={styles.Button}
-          onClick={() => this.props.moreImgs(this.handleClickFetchMore())}
-        >
-          Load more
-        </button>
-      );
-    }
+  if (status === 'idle') {
+    return (
+      <button
+        type="button"
+        className={styles.Button}
+        onClick={() => moreImgs(handleClickFetchMore())}
+      >
+        Load more
+      </button>
+    );
   }
 }
 

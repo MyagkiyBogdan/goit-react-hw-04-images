@@ -1,44 +1,40 @@
 import styles from './Modal.module.css';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+import { useEffect } from 'react';
 
 const modalRoot = document.querySelector('#modal-root');
 
-class Modal extends Component {
-  // Можно вынести <img> в APP как children для переиспользования компонента Modal, но в ТЗ этого нету.
+function Modal({ src, alt, toggleModal }) {
+  useEffect(() => {
+    console.log('add listener');
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      console.log('Remove listener');
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
-  handleKeyDown = e => {
+  function handleKeyDown(e) {
     if (e.code === 'Escape') {
-      this.props.toggleModal();
+      toggleModal();
     }
-  };
-
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
-
-  handleBackdropClick = e => {
+  const handleBackdropClick = e => {
     if (e.target === e.currentTarget) {
-      this.props.toggleModal();
+      toggleModal();
     }
   };
 
-  render() {
-    const { src, alt } = this.props;
-    return createPortal(
-      <div className={styles.Overlay} onClick={this.handleBackdropClick}>
-        <div className={styles.Modal}>
-          <img src={src} alt={alt} />
-        </div>
-      </div>,
-      modalRoot
-    );
-  }
+  return createPortal(
+    <div className={styles.Overlay} onClick={handleBackdropClick}>
+      <div className={styles.Modal}>
+        <img src={src} alt={alt} />
+      </div>
+    </div>,
+    modalRoot
+  );
 }
 
 Modal.propTypes = {

@@ -19,7 +19,6 @@ function Searchbar({ onSubmit }) {
     }
 
     onSubmit(searchInputInfo);
-    setSearchInputInfo('');
   };
 
   return (
